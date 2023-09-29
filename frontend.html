@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roll Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .dice {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .result {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dice">Player 1: <span id="player1Result">-</span></div>
+    <div class="dice">Player 2: <span id="player2Result">-</span></div>
+    <div class="result" id="roundResult">Round Result: </div>
+    <button onclick="playRound()">Roll Dice</button>
+
+    <script>
+        function playRound() {
+            const player1Result = document.getElementById("player1Result");
+            const player2Result = document.getElementById("player2Result");
+            const roundResult = document.getElementById("roundResult");
+
+            // Call C++ function to roll dice for player 1 and player 2
+            const player1Roll = Module.ccall('rollDice', 'number', [], []);
+            const player2Roll = Module.ccall('rollDice', 'number', [], []);
+
+            player1Result.textContent = player1Roll;
+            player2Result.textContent = player2Roll;
+
+            if (player1Roll > player2Roll) {
+                roundResult.textContent = "Player 1 wins this round!";
+            } else if (player2Roll > player1Roll) {
+                roundResult.textContent = "Player 2 wins this round!";
+            } else {
+                roundResult.textContent = "It's a tie!";
+            }
+        }
+    </script>
+
+    <script>
+        // Load the WebAssembly module
+        const Module = {
+            onRuntimeInitialized: function () {
+                playRound(); // Automatically play the first round when the page loads
+            }
+        };
+        const script = document.createElement('script');
+        script.src = 'dice_game.so.js';
+        document.body.appendChild(script);
+    </script>
+</body>
+
+</html>
